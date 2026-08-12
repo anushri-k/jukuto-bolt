@@ -9,7 +9,7 @@ const enterprise = [
   { icon: ShieldCheck, label: 'SOC 2 / ISO 27001' },
 ];
 
-const logos = ['BOSCH', 'MAGNA', 'CONTINENTAL', 'ZF', 'DENSO', 'AISIN', 'VALEO', 'HYUNDAI'];
+const logos = ['Indian Army', 'Fragmatic'];
 
 export function Testimonials() {
   return (

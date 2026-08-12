@@ -47,12 +47,6 @@ export function Nav() {
         </div>
 
         <div className="hidden lg:flex items-center gap-4">
-          <a
-            href="#contact"
-            className="font-semibold text-sm text-white/80 hover:text-white transition-colors"
-          >
-            Sign in
-          </a>
           <a href="#contact" className="btn-primary">
             Book a Demo
           </a>
