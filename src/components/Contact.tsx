@@ -31,13 +31,31 @@ export function Contact() {
     message: '',
   });
   const [submitted, setSubmitted] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState(false);
 
   const update = (key: string, value: string) =>
     setForm((p) => ({ ...p, [key]: value }));
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setSubmitted(true);
+    setSubmitting(true);
+    setError(false);
+
+    try {
+      const response = await fetch('https://formspree.io/f/mqpzblwy', {
+        method: 'POST',
+        headers: { Accept: 'application/json' },
+        body: new FormData(e.target as HTMLFormElement),
+      });
+
+      if (!response.ok) throw new Error('Submission failed');
+      setSubmitted(true);
+    } catch {
+      setError(true);
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   const inputClass =
@@ -107,6 +125,7 @@ export function Contact() {
                     </label>
                     <input
                       id="name"
+                      name="name"
                       type="text"
                       required
                       value={form.name}
@@ -121,6 +140,7 @@ export function Contact() {
                     </label>
                     <input
                       id="company"
+                      name="company"
                       type="text"
                       required
                       value={form.company}
@@ -138,6 +158,7 @@ export function Contact() {
                     </label>
                     <input
                       id="email"
+                      name="email"
                       type="email"
                       required
                       value={form.email}
@@ -152,6 +173,7 @@ export function Contact() {
                     </label>
                     <input
                       id="phone"
+                      name="phone"
                       type="tel"
                       value={form.phone}
                       onChange={(e) => update('phone', e.target.value)}
@@ -168,6 +190,7 @@ export function Contact() {
                     </label>
                     <select
                       id="industry"
+                      name="industry"
                       value={form.industry}
                       onChange={(e) => update('industry', e.target.value)}
                       className={inputClass}
@@ -186,6 +209,7 @@ export function Contact() {
                     </label>
                     <select
                       id="size"
+                      name="size"
                       value={form.size}
                       onChange={(e) => update('size', e.target.value)}
                       className={inputClass}
@@ -206,6 +230,7 @@ export function Contact() {
                   </label>
                   <textarea
                     id="message"
+                    name="message"
                     rows={5}
                     required
                     value={form.message}
@@ -215,12 +240,18 @@ export function Contact() {
                   />
                 </div>
 
+                {error && (
+                  <p className="text-sm text-vermillion">
+                    Something went wrong sending your message. Please try again.
+                  </p>
+                )}
+
                 <div className="flex items-center justify-between pt-2">
                   <p className="font-mono text-[10px] uppercase tracking-mono text-graphite">
                     We reply within 1 business day
                   </p>
-                  <button type="submit" className="btn-primary group">
-                    Send Message
+                  <button type="submit" disabled={submitting} className="btn-primary group disabled:opacity-60">
+                    {submitting ? 'Sending…' : 'Send Message'}
                     <ArrowRight
                       size={16}
                       className="transition-transform group-hover:translate-x-1"
