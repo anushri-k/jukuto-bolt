@@ -272,7 +272,7 @@ export function Contact() {
                 </div>
                 <div className="space-y-5 relative">
                   <a
-                    href="mailto:business.triptych@gmail.com"
+                    href="mailto:jukuto.xr@gmail.com"
                     className="flex items-start gap-4 group"
                   >
                     <div className="w-10 h-10 rounded-lg bg-white/10 flex items-center justify-center shrink-0 group-hover:bg-vermillion transition-colors duration-300">
@@ -283,12 +283,12 @@ export function Contact() {
                         Email
                       </div>
                       <div className="text-white text-sm group-hover:text-vermillion transition-colors">
-                        business.triptych@gmail.com
+                        jukuto.xr@gmail.com
                       </div>
                     </div>
                   </a>
 
-                  <a href="tel:+919876543210" className="flex items-start gap-4 group">
+                  <a href="tel:+919027554160" className="flex items-start gap-4 group">
                     <div className="w-10 h-10 rounded-lg bg-white/10 flex items-center justify-center shrink-0 group-hover:bg-vermillion transition-colors duration-300">
                       <Phone size={16} className="text-white" />
                     </div>
@@ -297,7 +297,7 @@ export function Contact() {
                         Phone
                       </div>
                       <div className="text-white text-sm group-hover:text-vermillion transition-colors">
-                        +91 98765 43210
+                        +91 90275 54160
                       </div>
                     </div>
                   </a>
@@ -311,7 +311,7 @@ export function Contact() {
                         Location
                       </div>
                       <div className="text-white text-sm leading-relaxed">
-                        Pune, Maharashtra
+                        Lucknow, Uttar Pradesh
                         <br />
                         India
                       </div>
@@ -319,7 +319,7 @@ export function Contact() {
                   </div>
 
                   <a
-                    href="https://www.linkedin.com"
+                    href="https://www.linkedin.com/company/jukuto"
                     target="_blank"
                     rel="noopener noreferrer"
                     className="flex items-start gap-4 group"

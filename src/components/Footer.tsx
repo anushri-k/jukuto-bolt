@@ -32,7 +32,7 @@ export function Footer() {
               training, built to be measured. Reliable. Precise. Modern. Classic.
             </p>
             <div className="mt-6 font-mono text-[10px] uppercase tracking-mono text-white/30">
-              business.triptych@gmail.com · jukuto.in
+              jukuto.xr@gmail.com · jukuto.in
             </div>
           </div>
 
@@ -81,7 +81,7 @@ export function Footer() {
             </div>
             <div className="flex gap-3">
               {[
-                { icon: Linkedin, href: 'https://www.linkedin.com', label: 'LinkedIn' },
+                { icon: Linkedin, href: 'https://www.linkedin.com/company/jukuto', label: 'LinkedIn' },
                 { icon: Twitter, href: 'https://www.twitter.com', label: 'Twitter' },
                 { icon: Github, href: 'https://www.github.com', label: 'GitHub' },
               ].map((s) => {
