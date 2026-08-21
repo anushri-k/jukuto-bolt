@@ -1,0 +1,159 @@
+/* Dedicated print layout — Section 9 of the spec. Screen chrome (nav, filters,
+   buttons, hover states) is hidden entirely; only .print-page content ships. */
+
+.print-page {
+  background: #FFFFFF;
+  color: #12141B;
+  font-family: 'Inter', -apple-system, 'Segoe UI', sans-serif;
+  font-size: 11.5px;
+  line-height: 1.5;
+  width: 210mm;
+  min-height: 297mm;
+  margin: 0 auto 24px;
+  padding: 15mm 15mm 15mm 20mm;
+  box-shadow: 0 0 0 1px #E3E7EF, 0 8px 24px rgba(18,20,27,0.08);
+  position: relative;
+}
+.print-page.landscape {
+  width: 297mm;
+  min-height: 210mm;
+}
+
+.print-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  border-bottom: 2px solid #1B1F35;
+  padding-bottom: 8px;
+  margin-bottom: 10px;
+}
+.print-header .doc-block {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 8.5px;
+  color: #363C4E;
+  text-align: right;
+  line-height: 1.6;
+}
+.print-footer {
+  border-top: 1px solid #E3E7EF;
+  margin-top: 16px;
+  padding-top: 6px;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 8px;
+  color: #363C4E;
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.print-h1 {
+  font-family: 'Fraunces', Georgia, serif;
+  font-weight: 600;
+  font-size: 19px;
+  color: #1B1F35;
+}
+.print-eyebrow {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 8.5px;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: #ED3123;
+  font-weight: 600;
+}
+
+.print-section {
+  break-inside: avoid;
+  page-break-inside: avoid;
+  margin-bottom: 10px;
+}
+.print-section-title {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 9px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: #1B1F35;
+  font-weight: 600;
+  background: #EEF1F7;
+  padding: 3px 8px;
+  margin-bottom: 6px;
+}
+
+.print-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 10.5px;
+}
+.print-table th, .print-table td {
+  border: 1px solid #C9CFDD;
+  padding: 4px 6px;
+  text-align: left;
+  vertical-align: top;
+}
+.print-table th {
+  background: #EEF1F7;
+  font-weight: 600;
+  font-size: 9px;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+.print-table tr, .print-table tbody { break-inside: avoid; page-break-inside: avoid; }
+
+.print-field-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 4px 16px;
+}
+.print-field .k { font-size: 8.5px; text-transform: uppercase; letter-spacing: 0.4px; color: #363C4E; font-family: 'IBM Plex Mono', monospace; }
+.print-field .v { font-size: 11px; color: #12141B; font-weight: 500; }
+
+.print-status-pill {
+  display: inline-block;
+  border: 1.5px solid #12141B;
+  border-radius: 3px;
+  padding: 1px 6px;
+  font-size: 9.5px;
+  font-weight: 700;
+}
+.print-status-pill.symbol { font-family: 'IBM Plex Mono', monospace; margin-right: 4px; }
+
+.sig-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  border: 1.5px solid #1B1F35;
+  break-inside: avoid;
+  page-break-inside: avoid;
+}
+.sig-cell {
+  border-right: 1px solid #1B1F35;
+  padding: 8px;
+}
+.sig-cell:last-child { border-right: none; }
+.sig-cell .head { font-family: 'IBM Plex Mono', monospace; font-size: 8px; text-transform: uppercase; letter-spacing: 0.4px; color: #363C4E; margin-bottom: 10px; }
+.sig-line { border-bottom: 1px solid #12141B; margin: 12px 0 3px; height: 14px; }
+.sig-label { font-size: 8px; color: #363C4E; }
+.sig-value { font-size: 10px; font-weight: 600; }
+
+@page {
+  size: A4 portrait;
+  margin: 0;
+}
+@page landscape {
+  size: A4 landscape;
+  margin: 0;
+}
+
+@media print {
+  html, body { background: #FFFFFF !important; }
+  .no-print { display: none !important; }
+  .print-only-root { display: block !important; }
+  .print-page {
+    box-shadow: none;
+    margin: 0;
+    page-break-after: always;
+  }
+  .print-page:last-child { page-break-after: auto; }
+}
+
+@media screen {
+  .print-only-root { background: #363C4E; padding: 24px 0; min-height: 100vh; }
+}
