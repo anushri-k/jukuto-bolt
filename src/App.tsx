@@ -9,8 +9,12 @@ import { Testimonials } from './components/Testimonials';
 import { FinalCTA } from './components/CTA';
 import { Contact } from './components/Contact';
 import { Footer } from './components/Footer';
+import DashboardApp from './dashboard/DashboardApp';
 
 function App() {
+  if (window.location.pathname.startsWith('/dashboard')) {
+    return <DashboardApp />;
+  }
   return (
     <div className="min-h-screen bg-white overflow-x-hidden">
       <Nav />
