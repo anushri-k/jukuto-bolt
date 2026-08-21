@@ -6,9 +6,10 @@ export { DATA, PILOT_STATION_ID } from './generator';
 import { DATA } from './generator';
 import { STATIONS } from './stations';
 import { Trainee, Certification, Session, Assessment } from './types';
+import { getTrainees } from '../lib/store';
 
 export function traineeById(id: string): Trainee | undefined {
-  return DATA.trainees.find(t => t.id === id);
+  return getTrainees().find(t => t.id === id);
 }
 export function stationById(id: string): typeof STATIONS[number] | undefined {
   return STATIONS.find(s => s.id === id);

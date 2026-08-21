@@ -1,7 +1,8 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import './print.css';
 import { AuthProvider, useAuth } from './lib/auth';
 import { LangProvider } from './lib/i18n';
+import { initStore } from './lib/store';
 import { Login } from './components/screens/Login';
 import { Shell } from './components/layout/Shell';
 import { AdminOverview } from './components/screens/AdminOverview';
@@ -49,7 +50,26 @@ function Router() {
   );
 }
 
+function Splash() {
+  return (
+    <div className="min-h-screen bg-indigo-800 flex items-center justify-center">
+      <svg width="36" height="36" viewBox="0 0 120 120" className="animate-pulse">
+        <path d="M76.9 23.75 A 40 40 0 1 1 43.1 23.75" fill="none" stroke="#FFFFFF" strokeWidth="9" strokeLinecap="round" />
+        <circle cx="76.9" cy="23.75" r="7.5" fill="#ED3123" />
+      </svg>
+    </div>
+  );
+}
+
 export default function DashboardApp() {
+  const [ready, setReady] = useState(false);
+
+  useEffect(() => {
+    initStore().finally(() => setReady(true));
+  }, []);
+
+  if (!ready) return <Splash />;
+
   return (
     <LangProvider>
       <AuthProvider>

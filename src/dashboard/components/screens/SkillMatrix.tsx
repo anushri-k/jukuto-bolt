@@ -1,12 +1,13 @@
 import { Printer } from 'lucide-react';
 import { Nav } from '../../DashboardApp';
-import { DATA, STATIONS } from '../../data';
+import { STATIONS } from '../../data';
 import { latestCertificationFor } from '../../data';
 import { Card, PageHeader } from '../ui';
 import { levelLabel } from '../../lib/i18n';
+import { useTrainees } from '../../lib/store';
 
 export function SkillMatrix({ nav }: { nav: Nav }) {
-  const trainees = DATA.trainees.filter(t => t.status !== 'Exited');
+  const trainees = useTrainees().filter(t => t.status !== 'Exited');
 
   return (
     <div>

@@ -1,19 +1,20 @@
 import { useState } from 'react';
 import { Printer } from 'lucide-react';
 import { Nav } from '../../DashboardApp';
-import { DATA } from '../../data';
 import { Card, PageHeader } from '../ui';
+import { useAuditLog } from '../../lib/store';
 
 export function AuditTrail({ nav }: { nav: Nav }) {
+  const auditLog = useAuditLog();
   const [actionFilter, setActionFilter] = useState('All');
-  const actions = Array.from(new Set(DATA.auditLog.map(a => a.action)));
-  const filtered = DATA.auditLog.filter(e => actionFilter === 'All' || e.action === actionFilter).slice().reverse().slice(0, 250);
+  const actions = Array.from(new Set(auditLog.map(a => a.action)));
+  const filtered = auditLog.filter(e => actionFilter === 'All' || e.action === actionFilter).slice().reverse().slice(0, 250);
 
   return (
     <div>
       <PageHeader
         title="Audit Trail"
-        subtitle={`${DATA.auditLog.length} events logged — immutable, filterable, printable.`}
+        subtitle={`${auditLog.length} events logged — immutable, filterable, printable.`}
         right={
           <button
             onClick={() => nav.go('reports', { report: 'audit-trail' })}
@@ -57,7 +58,7 @@ export function AuditTrail({ nav }: { nav: Nav }) {
           </tbody>
         </table>
       </Card>
-      {DATA.auditLog.length > 250 && <div className="text-xs text-graphite mt-2">Showing the 250 most recent of {DATA.auditLog.length} events. Use Print for the full filtered set.</div>}
+      {auditLog.length > 250 && <div className="text-xs text-graphite mt-2">Showing the 250 most recent of {auditLog.length} events. Use Print for the full filtered set.</div>}
     </div>
   );
 }

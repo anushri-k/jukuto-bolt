@@ -1,8 +1,13 @@
-import { ArrowLeft, Printer } from 'lucide-react';
+import { useState } from 'react';
+import { ArrowLeft, Printer, FileStack, Pencil, LogOut } from 'lucide-react';
 import { Nav } from '../../DashboardApp';
 import { traineeById, stationById, sessionsFor, assessmentsFor, certificationsFor } from '../../data';
 import { Card, PageHeader, StatusBadge, NotRecorded } from '../ui';
 import { levelLabel } from '../../lib/i18n';
+import { useTrainees, updateTrainee, exitTrainee, traineeToFormFields, TraineeFormFields } from '../../lib/store';
+import { useAuth, can } from '../../lib/auth';
+import { TraineeForm } from '../TraineeForm';
+import { ExitTraineeModal } from '../ExitTraineeModal';
 
 function Field({ label, value }: { label: string; value?: React.ReactNode }) {
   return (
@@ -14,9 +19,27 @@ function Field({ label, value }: { label: string; value?: React.ReactNode }) {
 }
 
 export function TraineeDetail({ nav, traineeId }: { nav: Nav; traineeId?: string }) {
+  useTrainees(); // subscribe so edits/exit are reflected immediately
+  const { user } = useAuth();
+  const [editing, setEditing] = useState(false);
+  const [exiting, setExiting] = useState(false);
+
   if (!traineeId) return <div className="text-sm text-graphite">No trainee selected.</div>;
   const trainee = traineeById(traineeId);
   if (!trainee) return <div className="text-sm text-graphite">Trainee not found.</div>;
+
+  const canManage = user ? can(user.role, 'enrol') : false;
+  const actor = user ? { name: user.name, id: user.employeeId, role: user.role } : null;
+  const submitEdit = (fields: TraineeFormFields) => {
+    if (!actor) return;
+    updateTrainee(trainee.id, fields, actor);
+    setEditing(false);
+  };
+  const confirmExit = (reason: string) => {
+    if (!actor) return;
+    exitTrainee(trainee.id, reason, actor);
+    setExiting(false);
+  };
 
   const station = stationById(trainee.targetStation);
   const sessions = sessionsFor(traineeId);
@@ -41,14 +64,47 @@ export function TraineeDetail({ nav, traineeId }: { nav: Nav; traineeId?: string
         title={trainee.name}
         subtitle={`${trainee.id} · ${trainee.designation} · ${trainee.department}`}
         right={
-          <button
-            onClick={() => nav.go('reports', { report: 'competence-record', traineeId: trainee.id, stationId: trainee.targetStation })}
-            className="flex items-center gap-2 bg-vermillion text-white text-sm font-semibold px-4 py-2 rounded-md hover:bg-vermillion-600 transition-colors"
-          >
-            <Printer size={15} /> Print Competence Record
-          </button>
+          <div className="flex flex-wrap gap-2">
+            {canManage && (
+              <>
+                <button
+                  onClick={() => setEditing(true)}
+                  className="flex items-center gap-2 bg-white border border-line text-indigo-800 text-sm font-semibold px-3.5 py-2 rounded-md hover:bg-cloud transition-colors"
+                >
+                  <Pencil size={15} /> Edit
+                </button>
+                {trainee.status !== 'Exited' && (
+                  <button
+                    onClick={() => setExiting(true)}
+                    className="flex items-center gap-2 bg-white border border-line text-vermillion text-sm font-semibold px-3.5 py-2 rounded-md hover:bg-vermillion-50 transition-colors"
+                  >
+                    <LogOut size={15} /> Exit trainee
+                  </button>
+                )}
+              </>
+            )}
+            <button
+              onClick={() => nav.go('reports', { report: 'competence-record', traineeId: trainee.id, stationId: trainee.targetStation })}
+              className="flex items-center gap-2 bg-white border border-vermillion text-vermillion text-sm font-semibold px-3.5 py-2 rounded-md hover:bg-vermillion-50 transition-colors"
+            >
+              <Printer size={15} /> Print Competence Record
+            </button>
+            <button
+              onClick={() => nav.go('reports', { report: 'employee-full-record', traineeId: trainee.id })}
+              className="flex items-center gap-2 bg-vermillion text-white text-sm font-semibold px-3.5 py-2 rounded-md hover:bg-vermillion-600 transition-colors"
+            >
+              <FileStack size={15} /> Download Full Record
+            </button>
+          </div>
         }
       />
+
+      {editing && (
+        <TraineeForm title={`Edit — ${trainee.name}`} initial={traineeToFormFields(trainee)} onCancel={() => setEditing(false)} onSubmit={submitEdit} />
+      )}
+      {exiting && (
+        <ExitTraineeModal traineeName={trainee.name} onCancel={() => setExiting(false)} onConfirm={confirmExit} />
+      )}
 
       <div className="grid lg:grid-cols-3 gap-6">
         <div className="lg:col-span-2 space-y-6">
@@ -121,21 +177,44 @@ export function TraineeDetail({ nav, traineeId }: { nav: Nav; traineeId?: string
 
           <Card className="p-5">
             <h2 className="font-serif text-lg font-semibold text-indigo-800 mb-4">Practice run trend — cycle time vs standard ({station?.standardCycleTimeSec}s)</h2>
-            {practiceRuns.length === 0 ? <NotRecorded /> : (
-              <div className="flex items-end gap-2 h-32">
-                {practiceRuns.map((s, i) => {
-                  const pct = station ? (s.cycleTimeAchievedSec / station.standardCycleTimeSec) * 100 : 100;
-                  const height = Math.min(100, Math.max(15, 100 - (pct - 100)));
-                  return (
-                    <div key={s.id} className="flex-1 flex flex-col items-center gap-1">
-                      <div className="text-[9px] text-graphite font-mono">{Math.round(pct)}%</div>
-                      <div className="w-full bg-cobalt-200 rounded-t" style={{ height: `${height}%` }} />
-                      <div className="text-[9px] text-graphite">Run {i + 1}</div>
-                    </div>
-                  );
-                })}
-              </div>
-            )}
+            {practiceRuns.length === 0 ? <NotRecorded /> : (() => {
+              const TRACK_PX = 96;
+              const pcts = practiceRuns.map(s => station ? (s.cycleTimeAchievedSec / station.standardCycleTimeSec) * 100 : 100);
+              const scaleMax = Math.max(150, ...pcts) * 1.05;
+              const targetLinePx = Math.round((100 / scaleMax) * TRACK_PX);
+              return (
+                <div>
+                  <div className="flex items-end gap-2 relative" style={{ height: TRACK_PX }}>
+                    <div
+                      className="absolute left-0 right-0 border-t border-dashed border-vermillion/60"
+                      style={{ bottom: targetLinePx }}
+                      title="Standard (100%)"
+                    />
+                    {practiceRuns.map((s, i) => {
+                      const pct = pcts[i];
+                      const barPx = Math.max(3, Math.round((pct / scaleMax) * TRACK_PX));
+                      return (
+                        <div key={s.id} className="flex-1 flex flex-col items-center justify-end h-full relative z-10">
+                          <div
+                            className="w-full bg-cobalt-400 rounded-t"
+                            style={{ height: `${barPx}px` }}
+                            title={`Run ${i + 1}: ${Math.round(pct)}% of standard`}
+                          />
+                        </div>
+                      );
+                    })}
+                  </div>
+                  <div className="flex gap-2 mt-1.5">
+                    {practiceRuns.map((s, i) => (
+                      <div key={s.id} className="flex-1 text-center">
+                        <div className="text-[9px] text-graphite font-mono">{Math.round(pcts[i])}%</div>
+                        <div className="text-[9px] text-graphite">Run {i + 1}</div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              );
+            })()}
           </Card>
         </div>
 
