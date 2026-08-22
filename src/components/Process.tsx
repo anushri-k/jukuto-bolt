@@ -1,4 +1,4 @@
-import { Reveal, CountUp } from './primitives';
+import { Reveal } from './primitives';
 import {
   Search,
   Boxes,
@@ -44,13 +44,6 @@ const steps = [
       'Identify competency drift, update modules as procedures evolve, and re-baseline against new standards.',
     tag: 'Phase 05',
   },
-];
-
-const stats = [
-  { value: 75, suffix: '%', label: 'Higher Knowledge Retention', sub: 'vs. classroom training' },
-  { value: 4, suffix: 'x', label: 'Faster Learning', sub: 'than traditional methods' },
-  { value: 60, suffix: '%', label: 'Reduced Training Cost', sub: 'across deployed plants' },
-  { value: 40, suffix: '%', label: 'Faster Onboarding', sub: 'from hire to line-ready' },
 ];
 
 export function Process() {
@@ -131,48 +124,6 @@ export function Process() {
               })}
             </div>
           </div>
-        </div>
-      </section>
-
-      {/* Why XR Works — Stats */}
-      <section className="section-pad bg-white relative">
-        <div className="container-max">
-          <Reveal className="max-w-3xl">
-            <div className="eyebrow mb-5">Why XR Works</div>
-            <h2 className="font-serif font-semibold text-indigo text-[clamp(2rem,4vw,3.25rem)] leading-[1.08] tracking-tight">
-              The numbers speak.
-              <br />
-              <span className="text-graphite">The evidence is clear.</span>
-            </h2>
-          </Reveal>
-
-          <div className="mt-16 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-px bg-line rounded-2xl overflow-hidden border border-line">
-            {stats.map((s, i) => (
-              <Reveal
-                key={s.label}
-                delay={i * 100}
-                className="bg-white p-10 md:p-12 group hover:bg-cloud transition-colors duration-500 relative overflow-hidden"
-              >
-                <div className="absolute top-0 left-0 right-0 h-1 bg-vermillion origin-left scale-x-0 group-hover:scale-x-100 transition-transform duration-500" />
-                <div className="font-serif font-semibold text-indigo text-[clamp(3rem,5vw,4.5rem)] leading-none tracking-tight">
-                  <CountUp value={s.value} suffix={s.suffix} />
-                </div>
-                <div className="mt-5 font-serif font-semibold text-indigo text-lg leading-snug">
-                  {s.label}
-                </div>
-                <div className="mt-2 font-mono text-[10px] uppercase tracking-mono text-graphite">
-                  {s.sub}
-                </div>
-              </Reveal>
-            ))}
-          </div>
-
-          <Reveal delay={200} className="mt-10">
-            <p className="font-mono text-[10px] uppercase tracking-mono text-graphite max-w-2xl">
-              * Based on aggregated data from Jukuto deployments across automotive,
-              aerospace, and heavy engineering customers, 2024–2026.
-            </p>
-          </Reveal>
         </div>
       </section>
     </>

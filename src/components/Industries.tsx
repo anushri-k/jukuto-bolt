@@ -17,8 +17,7 @@ const industries = [
     name: 'Tier 1 Manufacturing',
     description:
       'Supplier readiness at scale. Standardize training across plants and prove competency to every OEM you serve.',
-    image:
-      'https://images.pexels.com/photos/3827431/pexels-photo-3827431.jpeg?auto=compress&cs=tinysrgb&w=1200&h=800&fit=crop',
+    image: '/images/tier1.jpg',
     stat: 'Zero line downtime',
   },
   {
@@ -26,8 +25,7 @@ const industries = [
     name: 'Aerospace',
     description:
       'Precision procedures, safety-critical assemblies, and maintenance protocols — rehearsed to mastery in XR.',
-    image:
-      'https://images.pexels.com/photos/256541/pexels-photo-256541.jpeg?auto=compress&cs=tinysrgb&w=1200&h=800&fit=crop',
+    image: '/images/aerospace.jpg',
     stat: '100% audit traceability',
   },
   {
@@ -35,8 +33,7 @@ const industries = [
     name: 'Electronics',
     description:
       'Cleanroom protocols, ESD handling, and micro-assembly — trained without wasting a single component.',
-    image:
-      'https://images.pexels.com/photos/5083406/pexels-photo-5083406.jpeg?auto=compress&cs=tinysrgb&w=1200&h=800&fit=crop',
+    image: '/images/electronics.jpg',
     stat: '60% reduced scrap',
   },
   {
@@ -44,8 +41,7 @@ const industries = [
     name: 'Heavy Engineering',
     description:
       'Lifting, rigging, confined space, and hazardous-environment procedures — rehearsed safely, measured precisely.',
-    image:
-      'https://images.pexels.com/photos/236705/pexels-photo-236705.jpeg?auto=compress&cs=tinysrgb&w=1200&h=800&fit=crop',
+    image: '/images/heavy-machine.jpg',
     stat: '75% higher retention',
   },
   {

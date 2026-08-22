@@ -17,6 +17,7 @@ const modules = [
     description:
       'Full build sequences rehearsed in VR — torque order, fastener positions, and station handoffs.',
     accent: '#ED3123',
+    image: 'https://images.unsplash.com/photo-1717386255773-1e3037c81788?auto=format&fit=crop&w=800&h=600&q=80',
   },
   {
     icon: Settings,
@@ -24,6 +25,7 @@ const modules = [
     description:
       'Learn machine setup, changeover, and operation with real HMI replicas and fault scenarios.',
     accent: '#2B4BFF',
+    image: 'https://images.unsplash.com/photo-1581092335397-9583eb92d232?auto=format&fit=crop&w=800&h=600&q=80',
   },
   {
     icon: ShieldAlert,
@@ -31,6 +33,7 @@ const modules = [
     description:
       'LOTO, PPE, emergency stops, and hazard recognition — practiced until they become reflex.',
     accent: '#ED3123',
+    image: 'https://images.unsplash.com/photo-1528953030358-b0c7de371f1f?auto=format&fit=crop&w=800&h=600&q=80',
   },
   {
     icon: Wrench,
@@ -38,6 +41,7 @@ const modules = [
     description:
       'Preventive and corrective maintenance on digital twins — with every step logged and timed.',
     accent: '#2B4BFF',
+    image: 'https://images.unsplash.com/photo-1624027492684-327af1fb7559?auto=format&fit=crop&w=800&h=600&q=80',
   },
   {
     icon: Search,
@@ -45,6 +49,7 @@ const modules = [
     description:
       'Train the eye — visual defect detection, measurement, and SPC decision-making under real conditions.',
     accent: '#ED3123',
+    image: 'https://images.unsplash.com/photo-1700727448686-b314cb5f9948?auto=format&fit=crop&w=800&h=600&q=80',
   },
   {
     icon: Siren,
@@ -52,6 +57,7 @@ const modules = [
     description:
       'Fire, chemical, and evacuation drills rehearsed safely, with response times measured per operator.',
     accent: '#2B4BFF',
+    image: 'https://images.unsplash.com/photo-1576707995936-a6cffe26ef7b?auto=format&fit=crop&w=800&h=600&q=80',
   },
   {
     icon: ClipboardList,
@@ -59,6 +65,7 @@ const modules = [
     description:
       'Every standard work procedure — step-by-step, in-context, with competency checkpoints built in.',
     accent: '#ED3123',
+    image: 'https://images.unsplash.com/photo-1758599668338-4c55a3bd0ce0?auto=format&fit=crop&w=800&h=600&q=80',
   },
   {
     icon: Hammer,
@@ -66,6 +73,7 @@ const modules = [
     description:
       'Correct tool selection, use, and torque application — trained without wasting a single fastener.',
     accent: '#2B4BFF',
+    image: 'https://images.unsplash.com/photo-1631396327032-6f0c196973d4?auto=format&fit=crop&w=800&h=600&q=80',
   },
 ];
 
@@ -101,48 +109,25 @@ export function Modules() {
                   className="snap-start shrink-0"
                 >
                   <div className="group w-[320px] md:w-[360px] bg-white rounded-2xl border border-line overflow-hidden card-hover hover:shadow-[0_20px_50px_-20px_rgba(27,31,53,0.2)] hover:border-vermillion/30">
-                    {/* 3D-style illustration header */}
-                    <div
-                      className="relative h-44 overflow-hidden"
-                      style={{
-                        background: isVermillion
-                          ? 'linear-gradient(135deg, #1B1F35 0%, #2A2F44 100%)'
-                          : 'linear-gradient(135deg, #1B1F35 0%, #1F2647 100%)',
-                      }}
-                    >
-                      {/* Decorative grid */}
-                      <div className="absolute inset-0 grid-pattern opacity-30" />
+                    {/* Photo header */}
+                    <div className="relative h-44 overflow-hidden">
+                      <img
+                        src={m.image}
+                        alt={m.title}
+                        className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                        loading="lazy"
+                      />
+                      <div
+                        className="absolute inset-0"
+                        style={{
+                          background: isVermillion
+                            ? 'linear-gradient(135deg, rgba(27,31,53,0.85) 0%, rgba(42,47,68,0.55) 100%)'
+                            : 'linear-gradient(135deg, rgba(27,31,53,0.85) 0%, rgba(31,38,71,0.55) 100%)',
+                        }}
+                      />
 
-                      {/* Isometric cube illustration */}
-                      <svg
-                        viewBox="0 0 200 160"
-                        className="absolute inset-0 w-full h-full"
-                        xmlns="http://www.w3.org/2000/svg"
-                      >
-                        {/* Isometric platform */}
-                        <g transform="translate(100 80)">
-                          <polygon
-                            points="-50,20 0,45 50,20 0,-5"
-                            fill="rgba(255,255,255,0.04)"
-                            stroke={m.accent}
-                            strokeWidth="1"
-                            opacity="0.5"
-                          />
-                          <polygon
-                            points="-50,20 0,45 50,20 50,-30 0,-55 -50,-30"
-                            fill="none"
-                            stroke="rgba(255,255,255,0.1)"
-                            strokeWidth="1"
-                          />
-                          {/* Vertical lines */}
-                          <line x1="-50" y1="20" x2="-50" y2="-30" stroke="rgba(255,255,255,0.1)" strokeWidth="1" />
-                          <line x1="0" y1="45" x2="0" y2="-5" stroke="rgba(255,255,255,0.1)" strokeWidth="1" />
-                          <line x1="50" y1="20" x2="50" y2="-30" stroke="rgba(255,255,255,0.1)" strokeWidth="1" />
-                          {/* Accent checkpoint */}
-                          <circle cx="0" cy="-5" r="4" fill={m.accent} className="animate-pulse" />
-                          <circle cx="0" cy="-5" r="10" fill="none" stroke={m.accent} strokeWidth="1" opacity="0.4" />
-                        </g>
-                      </svg>
+                      {/* Decorative grid */}
+                      <div className="absolute inset-0 grid-pattern opacity-20" />
 
                       {/* Floating icon */}
                       <div className="absolute top-5 right-5">

@@ -23,8 +23,8 @@ function App() {
         <WhyJukuto />
         <Industries />
         <Modules />
-        <Platform />
         <Process />
+        <Platform />
         <Testimonials />
         <FinalCTA />
         <Contact />
