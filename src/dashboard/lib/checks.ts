@@ -1,5 +1,6 @@
 import { DATA, STATIONS, TODAY, THRESHOLDS } from '../data';
 import { Trainee } from '../data/types';
+import { getTrainees, getAuditLog } from './store';
 
 export interface CheckResult {
   id: string;
@@ -17,7 +18,9 @@ function traineeLabel(t: Trainee) { return `${t.name} (${t.id})`; }
 
 export function runChecks(): CheckResult[] {
   const results: CheckResult[] = [];
-  const { trainees, sessions, assessments, certifications, auditLog } = DATA;
+  const { sessions, assessments, certifications } = DATA;
+  const trainees = getTrainees();
+  const auditLog = getAuditLog();
 
   // --- A-01: zero operators working without current L3+ cert on current WI rev
   {

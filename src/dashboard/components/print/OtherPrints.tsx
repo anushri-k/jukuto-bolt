@@ -3,12 +3,13 @@ import { DATA, STATIONS, latestCertificationFor } from '../../data';
 import { DOCUMENT_CONTROL, CLAUSE_MAP, STANDARD_EDITION } from '../../data/config';
 import { levelLabel } from '../../lib/i18n';
 import { runChecks, auditReadinessScore } from '../../lib/checks';
+import { getTrainees, getAuditLog } from '../../lib/store';
 
-export function SkillMatrixPrint() {
-  const trainees = DATA.trainees.filter(t => t.status !== 'Exited');
+export function SkillMatrixPrint({ pageLabel = 'Page 1 of 1' }: { pageLabel?: string } = {}) {
+  const trainees = getTrainees().filter(t => t.status !== 'Exited');
   return (
     <PrintPage landscape>
-      <PrintHeader title="Skill Matrix" formatNumber={DOCUMENT_CONTROL.formatNumbers.skillMatrix} pageLabel="Page 1 of 1" />
+      <PrintHeader title="Skill Matrix" formatNumber={DOCUMENT_CONTROL.formatNumbers.skillMatrix} pageLabel={pageLabel} />
       <PrintSection title="Operator × Station — competence level">
         <table className="print-table">
           <thead>
@@ -40,17 +41,17 @@ export function SkillMatrixPrint() {
   );
 }
 
-export function RequalDuePrint() {
+export function RequalDuePrint({ pageLabel = 'Page 1 of 1' }: { pageLabel?: string } = {}) {
   const rows = DATA.certifications.filter(c => c.status === 'Re-qualification due');
   return (
     <PrintPage>
-      <PrintHeader title="Re-qualification Due Report" formatNumber={DOCUMENT_CONTROL.formatNumbers.requalDue} pageLabel="Page 1 of 1" />
+      <PrintHeader title="Re-qualification Due Report" formatNumber={DOCUMENT_CONTROL.formatNumbers.requalDue} pageLabel={pageLabel} />
       <PrintSection title={`${rows.length} certification(s) requiring re-qualification`}>
         <table className="print-table">
           <thead><tr><th>Operator</th><th>Station</th><th>Level</th><th>Valid until</th><th>Trigger reason</th></tr></thead>
           <tbody>
             {rows.map(c => {
-              const t = DATA.trainees.find(tt => tt.id === c.traineeId)!;
+              const t = getTrainees().find(tt => tt.id === c.traineeId)!;
               const s = STATIONS.find(ss => ss.id === c.stationId)!;
               return (
                 <tr key={c.id}>
@@ -71,17 +72,17 @@ export function RequalDuePrint() {
   );
 }
 
-export function StationCoveragePrint() {
+export function StationCoveragePrint({ pageLabel = 'Page 1 of 1' }: { pageLabel?: string } = {}) {
   return (
     <PrintPage landscape>
-      <PrintHeader title="Station Competence Coverage Report" formatNumber={DOCUMENT_CONTROL.formatNumbers.stationCoverage} pageLabel="Page 1 of 1" />
+      <PrintHeader title="Station Competence Coverage Report" formatNumber={DOCUMENT_CONTROL.formatNumbers.stationCoverage} pageLabel={pageLabel} />
       <PrintSection title="Certified operators by station and shift">
         <table className="print-table">
           <thead><tr><th>Station</th><th>Special char.</th><th>Min/shift</th><th>Shift A</th><th>Shift B</th><th>Shift C</th><th>Gap?</th></tr></thead>
           <tbody>
             {STATIONS.map(s => {
               const shifts: ('A' | 'B' | 'C')[] = ['A', 'B', 'C'];
-              const counts = shifts.map(sh => DATA.trainees.filter(t => t.targetStation === s.id && t.shift === sh && t.status === 'Certified').length);
+              const counts = shifts.map(sh => getTrainees().filter(t => t.targetStation === s.id && t.shift === sh && t.status === 'Certified').length);
               const gap = counts.some(c => c < s.minCertifiedPerShift);
               return (
                 <tr key={s.id}>
@@ -101,12 +102,13 @@ export function StationCoveragePrint() {
   );
 }
 
-export function AuditTrailPrint() {
-  const rows = DATA.auditLog.slice().reverse().slice(0, 60);
+export function AuditTrailPrint({ pageLabel = 'Page 1 of 1' }: { pageLabel?: string } = {}) {
+  const fullLog = getAuditLog();
+  const rows = fullLog.slice().reverse().slice(0, 60);
   return (
     <PrintPage>
-      <PrintHeader title="Audit Trail Report" formatNumber={DOCUMENT_CONTROL.formatNumbers.auditTrail} pageLabel="Page 1 of 1" />
-      <PrintSection title={`Most recent ${rows.length} of ${DATA.auditLog.length} logged events`}>
+      <PrintHeader title="Audit Trail Report" formatNumber={DOCUMENT_CONTROL.formatNumbers.auditTrail} pageLabel={pageLabel} />
+      <PrintSection title={`Most recent ${rows.length} of ${fullLog.length} logged events`}>
         <table className="print-table">
           <thead><tr><th>Timestamp</th><th>User</th><th>Role</th><th>Action</th><th>Record</th></tr></thead>
           <tbody>
@@ -127,12 +129,12 @@ export function AuditTrailPrint() {
   );
 }
 
-export function AuditReadinessPrint() {
+export function AuditReadinessPrint({ pageLabel = 'Page 1 of 1' }: { pageLabel?: string } = {}) {
   const checks = runChecks();
   const score = auditReadinessScore(checks);
   return (
     <PrintPage>
-      <PrintHeader title="Audit-Readiness Summary" formatNumber={DOCUMENT_CONTROL.formatNumbers.auditPack} pageLabel="Page 1 of 1" />
+      <PrintHeader title="Audit-Readiness Summary" formatNumber={DOCUMENT_CONTROL.formatNumbers.auditPack} pageLabel={pageLabel} />
       <PrintSection title={`Composite score: ${score}% (${checks.filter(c => c.pass).length}/${checks.length} checks passing)`}>
         <table className="print-table">
           <thead><tr><th>Check</th><th>Description</th><th>Result</th><th>Failing records</th></tr></thead>

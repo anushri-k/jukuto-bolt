@@ -74,6 +74,47 @@ export function PrintField({ label, value }: { label: string; value: ReactNode }
   );
 }
 
+export function PrintLineChart({
+  label, values, unit = '', targetLine, width = 460, height = 90,
+}: { label: string; values: { x: string; y: number }[]; unit?: string; targetLine?: number; width?: number; height?: number }) {
+  if (values.length === 0) {
+    return (
+      <div style={{ fontSize: 10, fontStyle: 'italic', color: '#8890A0' }}>{label}: Not recorded</div>
+    );
+  }
+  const padL = 28, padR = 8, padT = 10, padB = 18;
+  const plotW = width - padL - padR;
+  const plotH = height - padT - padB;
+  const ys = values.map(v => v.y);
+  const maxY = Math.max(...ys, targetLine ?? 0) * 1.1 || 1;
+  const minY = Math.min(0, Math.min(...ys));
+  const xFor = (i: number) => padL + (values.length === 1 ? plotW / 2 : (i / (values.length - 1)) * plotW);
+  const yFor = (v: number) => padT + plotH - ((v - minY) / (maxY - minY || 1)) * plotH;
+  const points = values.map((v, i) => `${xFor(i)},${yFor(v.y)}`).join(' ');
+
+  return (
+    <div style={{ marginBottom: 4 }}>
+      <div style={{ fontSize: 9, fontWeight: 600, color: '#1B1F35', marginBottom: 2 }}>{label}</div>
+      <svg width={width} height={height} style={{ overflow: 'visible' }}>
+        <line x1={padL} y1={padT} x2={padL} y2={padT + plotH} stroke="#C9CFDD" strokeWidth={1} />
+        <line x1={padL} y1={padT + plotH} x2={padL + plotW} y2={padT + plotH} stroke="#C9CFDD" strokeWidth={1} />
+        <text x={2} y={padT + 4} fontSize={7} fill="#363C4E">{Math.round(maxY)}{unit}</text>
+        <text x={2} y={padT + plotH} fontSize={7} fill="#363C4E">{Math.round(minY)}{unit}</text>
+        {targetLine !== undefined && (
+          <line x1={padL} y1={yFor(targetLine)} x2={padL + plotW} y2={yFor(targetLine)} stroke="#ED3123" strokeWidth={1} strokeDasharray="3,2" />
+        )}
+        <polyline points={points} fill="none" stroke="#1B1F35" strokeWidth={1.6} />
+        {values.map((v, i) => (
+          <circle key={i} cx={xFor(i)} cy={yFor(v.y)} r={2.2} fill="#1B1F35" />
+        ))}
+        {values.map((v, i) => (
+          <text key={i} x={xFor(i)} y={padT + plotH + 12} fontSize={6.5} fill="#363C4E" textAnchor="middle">{v.x}</text>
+        ))}
+      </svg>
+    </div>
+  );
+}
+
 export function SignatureBlock({
   recommended, verified, authorised, acknowledged, auditTrailRef,
 }: {

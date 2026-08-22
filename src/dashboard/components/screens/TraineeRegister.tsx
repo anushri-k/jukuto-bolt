@@ -1,19 +1,30 @@
 import { useMemo, useState } from 'react';
-import { Search } from 'lucide-react';
+import { Search, Plus, Pencil, LogOut } from 'lucide-react';
 import { Nav } from '../../DashboardApp';
-import { DATA, STATIONS } from '../../data';
+import { STATIONS } from '../../data';
 import { Card, PageHeader, StatusBadge } from '../ui';
 import { latestCertificationFor } from '../../data';
+import { useTrainees, addTrainee, updateTrainee, exitTrainee, traineeToFormFields, TraineeFormFields } from '../../lib/store';
+import { useAuth, can } from '../../lib/auth';
+import { TraineeForm } from '../TraineeForm';
+import { ExitTraineeModal } from '../ExitTraineeModal';
+import { Trainee } from '../../data/types';
 
 export function TraineeRegister({ nav }: { nav: Nav }) {
+  const trainees = useTrainees();
+  const { user } = useAuth();
   const [query, setQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState(nav.params?.status ?? 'All');
   const [stationFilter, setStationFilter] = useState('All');
   const [employmentFilter, setEmploymentFilter] = useState('All');
 
-  const statuses = useMemo(() => Array.from(new Set(DATA.trainees.map(t => t.status))), []);
+  const [creating, setCreating] = useState(false);
+  const [editing, setEditing] = useState<Trainee | null>(null);
+  const [exiting, setExiting] = useState<Trainee | null>(null);
 
-  const filtered = DATA.trainees.filter(t => {
+  const statuses = useMemo(() => Array.from(new Set(trainees.map(t => t.status))), [trainees]);
+
+  const filtered = trainees.filter(t => {
     if (statusFilter !== 'All' && t.status !== statusFilter) return false;
     if (stationFilter !== 'All' && t.targetStation !== stationFilter) return false;
     if (employmentFilter !== 'All' && t.employmentType !== employmentFilter) return false;
@@ -21,9 +32,39 @@ export function TraineeRegister({ nav }: { nav: Nav }) {
     return true;
   });
 
+  const canManage = user ? can(user.role, 'enrol') : false;
+  const actor = user ? { name: user.name, id: user.employeeId, role: user.role } : null;
+
+  const submitCreate = (fields: TraineeFormFields) => {
+    if (!actor) return;
+    addTrainee(fields, actor);
+    setCreating(false);
+  };
+  const submitEdit = (fields: TraineeFormFields) => {
+    if (!actor || !editing) return;
+    updateTrainee(editing.id, fields, actor);
+    setEditing(null);
+  };
+  const confirmExit = (reason: string) => {
+    if (!actor || !exiting) return;
+    exitTrainee(exiting.id, reason, actor);
+    setExiting(null);
+  };
+
   return (
     <div>
-      <PageHeader title="Trainee Register" subtitle={`${filtered.length} of ${DATA.trainees.length} trainees`} />
+      <PageHeader
+        title="Trainee Register"
+        subtitle={`${filtered.length} of ${trainees.length} trainees`}
+        right={canManage ? (
+          <button
+            onClick={() => setCreating(true)}
+            className="flex items-center gap-2 bg-vermillion text-white text-sm font-semibold px-4 py-2 rounded-md hover:bg-vermillion-600 transition-colors"
+          >
+            <Plus size={15} /> Enrol trainee
+          </button>
+        ) : undefined}
+      />
 
       <Card className="p-4 mb-4">
         <div className="flex flex-wrap gap-3">
@@ -62,6 +103,7 @@ export function TraineeRegister({ nav }: { nav: Nav }) {
               <th className="px-4 py-3 font-semibold text-graphite text-xs uppercase tracking-wide">Status</th>
               <th className="px-4 py-3 font-semibold text-graphite text-xs uppercase tracking-wide">Level</th>
               <th className="px-4 py-3 font-semibold text-graphite text-xs uppercase tracking-wide">Last activity</th>
+              {canManage && <th className="px-4 py-3 font-semibold text-graphite text-xs uppercase tracking-wide text-right">Actions</th>}
             </tr>
           </thead>
           <tbody>
@@ -71,10 +113,9 @@ export function TraineeRegister({ nav }: { nav: Nav }) {
               return (
                 <tr
                   key={t.id}
-                  onClick={() => nav.go('trainee-detail', { id: t.id })}
-                  className="border-b border-line last:border-0 hover:bg-cloud cursor-pointer transition-colors"
+                  className="border-b border-line last:border-0 hover:bg-cloud transition-colors"
                 >
-                  <td className="px-4 py-3">
+                  <td className="px-4 py-3 cursor-pointer" onClick={() => nav.go('trainee-detail', { id: t.id })}>
                     <div className="flex items-center gap-2.5">
                       <div className="w-8 h-8 rounded-full bg-indigo-100 text-indigo-800 font-semibold text-[11px] flex items-center justify-center shrink-0">
                         {t.photoInitials}
@@ -85,21 +126,41 @@ export function TraineeRegister({ nav }: { nav: Nav }) {
                       </div>
                     </div>
                   </td>
-                  <td className="px-4 py-3 text-graphite">{t.employmentType}{t.contractorName ? ` · ${t.contractorName}` : ''}</td>
-                  <td className="px-4 py-3 text-graphite">{station?.name ?? 'Not recorded'}</td>
-                  <td className="px-4 py-3 text-graphite">{t.shift}</td>
-                  <td className="px-4 py-3"><StatusBadge status={t.status} /></td>
-                  <td className="px-4 py-3 text-graphite">{cert ? `L${cert.levelAwarded}` : '—'}</td>
-                  <td className="px-4 py-3 text-graphite">{t.modifiedAt.slice(0, 10)}</td>
+                  <td className="px-4 py-3 text-graphite cursor-pointer" onClick={() => nav.go('trainee-detail', { id: t.id })}>{t.employmentType}{t.contractorName ? ` · ${t.contractorName}` : ''}</td>
+                  <td className="px-4 py-3 text-graphite cursor-pointer" onClick={() => nav.go('trainee-detail', { id: t.id })}>{station?.name ?? 'Not recorded'}</td>
+                  <td className="px-4 py-3 text-graphite cursor-pointer" onClick={() => nav.go('trainee-detail', { id: t.id })}>{t.shift}</td>
+                  <td className="px-4 py-3 cursor-pointer" onClick={() => nav.go('trainee-detail', { id: t.id })}><StatusBadge status={t.status} /></td>
+                  <td className="px-4 py-3 text-graphite cursor-pointer" onClick={() => nav.go('trainee-detail', { id: t.id })}>{cert ? `L${cert.levelAwarded}` : '—'}</td>
+                  <td className="px-4 py-3 text-graphite cursor-pointer" onClick={() => nav.go('trainee-detail', { id: t.id })}>{t.modifiedAt.slice(0, 10)}</td>
+                  {canManage && (
+                    <td className="px-4 py-3 text-right">
+                      <div className="flex justify-end gap-2">
+                        <button onClick={() => setEditing(t)} title="Edit" className="text-graphite hover:text-cobalt"><Pencil size={15} /></button>
+                        {t.status !== 'Exited' && (
+                          <button onClick={() => setExiting(t)} title="Exit trainee" className="text-graphite hover:text-vermillion"><LogOut size={15} /></button>
+                        )}
+                      </div>
+                    </td>
+                  )}
                 </tr>
               );
             })}
             {filtered.length === 0 && (
-              <tr><td colSpan={7} className="px-4 py-10 text-center text-graphite text-sm">No trainees match these filters.</td></tr>
+              <tr><td colSpan={canManage ? 8 : 7} className="px-4 py-10 text-center text-graphite text-sm">No trainees match these filters.</td></tr>
             )}
           </tbody>
         </table>
       </Card>
+
+      {creating && (
+        <TraineeForm title="Enrol trainee" onCancel={() => setCreating(false)} onSubmit={submitCreate} />
+      )}
+      {editing && (
+        <TraineeForm title={`Edit — ${editing.name}`} initial={traineeToFormFields(editing)} onCancel={() => setEditing(null)} onSubmit={submitEdit} />
+      )}
+      {exiting && (
+        <ExitTraineeModal traineeName={exiting.name} onCancel={() => setExiting(null)} onConfirm={confirmExit} />
+      )}
     </div>
   );
 }

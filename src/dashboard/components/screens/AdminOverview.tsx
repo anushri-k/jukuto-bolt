@@ -3,12 +3,14 @@ import { Nav } from '../../DashboardApp';
 import { DATA, STATIONS, TODAY } from '../../data';
 import { Card, PageHeader, StatCard, StatusBadge } from '../ui';
 import { runChecks, auditReadinessScore } from '../../lib/checks';
+import { useTrainees } from '../../lib/store';
 
 const dayMs = 86400000;
 const daysBetween = (a: string, b: string) => Math.round((new Date(b + 'T00:00:00').getTime() - new Date(a + 'T00:00:00').getTime()) / dayMs);
 
 export function AdminOverview({ nav }: { nav: Nav }) {
-  const { trainees, certifications } = DATA;
+  const trainees = useTrainees();
+  const { certifications } = DATA;
   const checks = runChecks();
   const score = auditReadinessScore(checks);
   const failingChecks = checks.filter(c => !c.pass);

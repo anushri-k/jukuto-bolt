@@ -1,16 +1,18 @@
 import { AlertTriangle } from 'lucide-react';
 import { Nav } from '../../DashboardApp';
-import { DATA, STATIONS } from '../../data';
+import { STATIONS } from '../../data';
 import { Card, PageHeader } from '../ui';
+import { useTrainees } from '../../lib/store';
 
 export function StationMaster({ nav }: { nav: Nav }) {
+  const trainees = useTrainees();
   return (
     <div>
       <PageHeader title="Station / Operation Master" subtitle={`${STATIONS.length} stations across 3 lines.`} />
       <div className="grid md:grid-cols-2 gap-4">
         {STATIONS.map(station => {
           const shifts: ('A' | 'B' | 'C')[] = ['A', 'B', 'C'];
-          const certifiedTotal = DATA.trainees.filter(t => t.targetStation === station.id && t.status === 'Certified').length;
+          const certifiedTotal = trainees.filter(t => t.targetStation === station.id && t.status === 'Certified').length;
           return (
             <Card key={station.id} className="p-5">
               <div className="flex items-start justify-between gap-3">
@@ -33,7 +35,7 @@ export function StationMaster({ nav }: { nav: Nav }) {
                 <div className="text-xs text-graphite mb-1.5">Certified operators per shift (min {station.minCertifiedPerShift} required)</div>
                 <div className="flex gap-2">
                   {shifts.map(sh => {
-                    const count = DATA.trainees.filter(t => t.targetStation === station.id && t.shift === sh && t.status === 'Certified').length;
+                    const count = trainees.filter(t => t.targetStation === station.id && t.shift === sh && t.status === 'Certified').length;
                     const gap = count < station.minCertifiedPerShift;
                     return (
                       <span key={sh} className={`flex items-center gap-1 text-xs font-semibold px-2 py-1 rounded-md ${gap ? 'bg-vermillion-50 text-vermillion-700' : 'bg-emerald-50 text-emerald-700'}`}>
