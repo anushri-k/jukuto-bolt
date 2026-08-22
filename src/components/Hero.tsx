@@ -31,7 +31,7 @@ export function Hero() {
         }}
       >
         <img
-          src="https://images.pexels.com/photos/3827431/pexels-photo-3827431.jpeg?auto=compress&cs=tinysrgb&w=1920&h=1080&fit=crop"
+          src="/images/hero-banner.jpg"
           alt="Automotive production line with robotic arms"
           className="w-full h-full object-cover opacity-50"
           loading="eager"
@@ -133,7 +133,7 @@ export function Hero() {
       </div>
 
       <div
-        className="absolute top-[40%] left-[5%] z-10 hidden xl:block animate-float"
+        className="absolute bottom-[10%] right-[6%] z-10 hidden xl:block animate-float"
         style={{ transform: parallax(-0.04) }}
       >
         <div className="glass rounded-xl p-4 w-52 shadow-2xl">
