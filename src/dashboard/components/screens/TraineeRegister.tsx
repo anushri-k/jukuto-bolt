@@ -1,13 +1,14 @@
 import { useMemo, useState } from 'react';
-import { Search, Plus, Pencil, LogOut } from 'lucide-react';
+import { Search, Plus, Pencil, LogOut, Upload } from 'lucide-react';
 import { Nav } from '../../DashboardApp';
 import { STATIONS } from '../../data';
 import { Card, PageHeader, StatusBadge } from '../ui';
 import { latestCertificationFor } from '../../data';
-import { useTrainees, addTrainee, updateTrainee, exitTrainee, traineeToFormFields, TraineeFormFields } from '../../lib/store';
+import { useTrainees, addTrainee, addTraineesBulk, updateTrainee, exitTrainee, traineeToFormFields, TraineeFormFields } from '../../lib/store';
 import { useAuth, can } from '../../lib/auth';
 import { TraineeForm } from '../TraineeForm';
 import { ExitTraineeModal } from '../ExitTraineeModal';
+import { TraineeImportModal } from '../TraineeImportModal';
 import { Trainee } from '../../data/types';
 
 export function TraineeRegister({ nav }: { nav: Nav }) {
@@ -19,6 +20,8 @@ export function TraineeRegister({ nav }: { nav: Nav }) {
   const [employmentFilter, setEmploymentFilter] = useState('All');
 
   const [creating, setCreating] = useState(false);
+  const [importing, setImporting] = useState(false);
+  const [importNotice, setImportNotice] = useState('');
   const [editing, setEditing] = useState<Trainee | null>(null);
   const [exiting, setExiting] = useState<Trainee | null>(null);
 
@@ -45,6 +48,12 @@ export function TraineeRegister({ nav }: { nav: Nav }) {
     updateTrainee(editing.id, fields, actor);
     setEditing(null);
   };
+  const submitImport = (rows: TraineeFormFields[]) => {
+    if (!actor) return;
+    const created = addTraineesBulk(rows, actor);
+    setImporting(false);
+    setImportNotice(`Enrolled ${created.length} trainee${created.length === 1 ? '' : 's'} from CSV.`);
+  };
   const confirmExit = (reason: string) => {
     if (!actor || !exiting) return;
     exitTrainee(exiting.id, reason, actor);
@@ -57,14 +66,29 @@ export function TraineeRegister({ nav }: { nav: Nav }) {
         title="Trainee Register"
         subtitle={`${filtered.length} of ${trainees.length} trainees`}
         right={canManage ? (
-          <button
-            onClick={() => setCreating(true)}
-            className="flex items-center gap-2 bg-vermillion text-white text-sm font-semibold px-4 py-2 rounded-md hover:bg-vermillion-600 transition-colors"
-          >
-            <Plus size={15} /> Enrol trainee
-          </button>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => setImporting(true)}
+              className="flex items-center gap-2 border border-line text-graphite text-sm font-semibold px-4 py-2 rounded-md hover:bg-cloud transition-colors"
+            >
+              <Upload size={15} /> Import CSV
+            </button>
+            <button
+              onClick={() => setCreating(true)}
+              className="flex items-center gap-2 bg-vermillion text-white text-sm font-semibold px-4 py-2 rounded-md hover:bg-vermillion-600 transition-colors"
+            >
+              <Plus size={15} /> Enrol trainee
+            </button>
+          </div>
         ) : undefined}
       />
+
+      {importNotice && (
+        <div className="mb-4 flex items-center justify-between gap-3 bg-emerald-50 border border-emerald-200 text-emerald-800 text-sm rounded-md px-4 py-2.5">
+          <span>{importNotice}</span>
+          <button onClick={() => setImportNotice('')} className="text-emerald-700 hover:text-emerald-900 text-xs font-semibold">Dismiss</button>
+        </div>
+      )}
 
       <Card className="p-4 mb-4">
         <div className="flex flex-wrap gap-3">
@@ -157,6 +181,9 @@ export function TraineeRegister({ nav }: { nav: Nav }) {
       )}
       {editing && (
         <TraineeForm title={`Edit — ${editing.name}`} initial={traineeToFormFields(editing)} onCancel={() => setEditing(null)} onSubmit={submitEdit} />
+      )}
+      {importing && (
+        <TraineeImportModal onCancel={() => setImporting(false)} onImport={submitImport} />
       )}
       {exiting && (
         <ExitTraineeModal traineeName={exiting.name} onCancel={() => setExiting(null)} onConfirm={confirmExit} />

@@ -272,7 +272,7 @@ export function Contact() {
                 </div>
                 <div className="space-y-5 relative">
                   <a
-                    href="mailto:jukuto.xr@gmail.com"
+                    href="mailto:jukuto@triptych-technologies.com"
                     className="flex items-start gap-4 group"
                   >
                     <div className="w-10 h-10 rounded-lg bg-white/10 flex items-center justify-center shrink-0 group-hover:bg-vermillion transition-colors duration-300">
@@ -283,7 +283,7 @@ export function Contact() {
                         Email
                       </div>
                       <div className="text-white text-sm group-hover:text-vermillion transition-colors">
-                        jukuto.xr@gmail.com
+                        jukuto@triptych-technologies.com
                       </div>
                     </div>
                   </a>

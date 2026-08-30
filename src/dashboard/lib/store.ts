@@ -103,9 +103,9 @@ function initials(name: string) {
   return name.split(' ').filter(Boolean).map(w => w[0]).slice(0, 2).join('').toUpperCase();
 }
 
-function nextTraineeId(): string {
+function nextTraineeId(from: Trainee[] = trainees): string {
   let max = 2000;
-  trainees.forEach(t => {
+  from.forEach(t => {
     const m = /EMP-(\d+)/.exec(t.id);
     if (m) max = Math.max(max, parseInt(m[1], 10));
   });
@@ -133,10 +133,9 @@ export interface TraineeFormFields {
   medicalDone: boolean;
 }
 
-export function addTrainee(fields: TraineeFormFields, actor: AuditActor): Trainee {
-  const id = nextTraineeId();
+function buildTrainee(fields: TraineeFormFields, id: string, actor: AuditActor): Trainee {
   const now = new Date().toISOString();
-  const trainee: Trainee = {
+  return {
     id,
     name: fields.name,
     photoInitials: initials(fields.name),
@@ -166,11 +165,35 @@ export function addTrainee(fields: TraineeFormFields, actor: AuditActor): Traine
     modifiedBy: actor.name,
     modifiedAt: now,
   };
+}
+
+export function addTrainee(fields: TraineeFormFields, actor: AuditActor): Trainee {
+  const trainee = buildTrainee(fields, nextTraineeId(), actor);
   trainees = [...trainees, trainee];
-  logAudit(actor, 'Edit', 'Trainee', id);
+  logAudit(actor, 'Edit', 'Trainee', trainee.id);
   emit();
   void saveToServer();
   return trainee;
+}
+
+/**
+ * Enrols many trainees in one shot (CSV bulk import). Shares buildTrainee with
+ * addTrainee so an imported row lands identically to a hand-keyed one; IDs are
+ * allocated sequentially and the store is emitted/persisted once at the end
+ * rather than per row.
+ */
+export function addTraineesBulk(rows: TraineeFormFields[], actor: AuditActor): Trainee[] {
+  if (rows.length === 0) return [];
+  const created: Trainee[] = [];
+  rows.forEach(fields => {
+    const trainee = buildTrainee(fields, nextTraineeId([...trainees, ...created]), actor);
+    created.push(trainee);
+  });
+  trainees = [...trainees, ...created];
+  created.forEach(t => logAudit(actor, 'Edit', 'Trainee', t.id));
+  emit();
+  void saveToServer();
+  return created;
 }
 
 export function updateTrainee(id: string, fields: TraineeFormFields, actor: AuditActor) {
