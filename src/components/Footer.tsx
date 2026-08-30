@@ -32,7 +32,7 @@ export function Footer() {
               training, built to be measured. Reliable. Precise. Modern. Classic.
             </p>
             <div className="mt-6 font-mono text-[10px] uppercase tracking-mono text-white/30">
-              jukuto.xr@gmail.com · jukuto.in
+              jukuto@triptych-technologies.com · jukuto.in
             </div>
           </div>
 
@@ -106,7 +106,7 @@ export function Footer() {
         {/* Bottom bar */}
         <div className="mt-16 pt-8 border-t border-white/10 flex flex-col md:flex-row items-center justify-between gap-4">
           <div className="font-mono text-[10px] uppercase tracking-mono text-white/30">
-            © {new Date().getFullYear()} Jukuto. All rights reserved.
+            © {new Date().getFullYear()} Triptych Technologies Pvt. Ltd. All rights reserved.
           </div>
           <div className="font-mono text-[10px] uppercase tracking-mono text-white/30">
             Keep the Dojo. Prove the Result.
